@@ -1,7 +1,0 @@
-# 只更新，使用他到他的容器里的数据会自动更新（有一定延时），由kubelete维护
-apiVersion: v1
-kind: ConfigMap #是帮你把 Pod 想要访问的 一般数据，如配置文件，存放到 Etcd 中。然后，你就可以通过在 Pod 的容器里挂载 Volume 的方式，访问到这些 configMap 里保存的信息了
-metadata:
-    name: myconfigmap
-data: 
-    a.b.c: haha
