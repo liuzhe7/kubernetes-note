@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+        name: res
+        labels:
+                app: res
+spec:
+        containers:
+                - name: nginx
+                  image: mysql
+                  env:
+                          - name: MYSQL_ROOT_PASSWORD
+                            value: "password"
+                  
+                  resources:   # cpu设置为正数 且 requests == limits 的时候 该pod会绑定固定的cpu 从而减少上下文切换的次数
+                          requests: # 当pod被调度时的资源考量依据    因为大部分时候pod并不会使用到上限的资源，所以总会设置较小 requests 和较大的 limits
+                                  memory: "64Mi"
+                                  cpu: "250m"  #250m=0.25cpu    cpu 设置为 整数时 比如说 cpu: 2 则绑定两个cpu 提升，这里pod只使用这两个cpu提升了使用率
+                          limits:
+                                  memory: "1280Mi" # 实际内存使用上限
+                                  cpu: "500m" # 实际cpu使用上限

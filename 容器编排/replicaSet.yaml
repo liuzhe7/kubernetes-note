@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet # 直接控制pod的控制器， 他控制的pod的restartPolicy属性必须是Always， 因为pod是running状态保证他的数量才有意义, 控制器被删除时，他所控制的对象也会被删除
+metadata:
+  name: nginx-set
+  labels:
+    app: nginx
+spec:
+  replicas: 3  #pod数量为3
+  selector:
+    matchLabels:   #通过labels筛选控制的pod
+      app: nginx
+
+
+
+  template: # pod的定义
+    metadata:  # pod的name此处不用定义，会自动加上rsname-xxxx的格式
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9

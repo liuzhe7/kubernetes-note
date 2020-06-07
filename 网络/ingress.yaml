@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress  # 用来描述ingresscontroller的配置，ingress-controller是一个pod,比如里面跑的nginx服务，这样就将工作在第四层的service提升到了应用层的负载均衡,
+               #再 使用一个nodeport的service把ingress-controller 暴露到外界  就实现了 外界-nginx-service-pod的这样一个应用层负载均衡
+metadata:
+  name: cafe-ingress
+spec:
+  tls:
+  - hosts:
+    - cafe.example.com  
+    secretName: cafe-secret
+  rules:
+  - host: cafe.example.com
+    http:
+      paths:
+      - path: /tea
+        backend:
+          serviceName: tea-svc
+          servicePort: 80
+      - path: /coffee
+        backend:
+          serviceName: coffee-svc
+          servicePort: 80

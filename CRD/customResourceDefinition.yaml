@@ -1,0 +1,13 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition   #自定义一个api类型
+metadata:
+  name: networks.samplecrd.k8s.io
+
+spec:
+
+  group: samplecrd.k8s.io  #自定义的类型的group是samplecrd.k8s.io  (group/version/resource可以找到一个唯一的api对象的handler)
+  version: v1
+  names:
+    kind: Network
+    plural: networks # 复数形式
+  scope: Namespaced  #我们定义的这个 Network 是一个属于 Namespace 的对象，类似于 Pod。

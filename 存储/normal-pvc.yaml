@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim # 简称pvc 相当于pv的接口， 可以像projected-volume那样作为一种volume类型， 真实的形取决于与其绑定的pv
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+  - ReadWriteOnce   #可读可写; ReadOnlyMany-该卷可以被许多节点只读安装; ReadWriteMany-该卷可以被许多节点读写安装
+  resources:
+    requests:
+      storage: 1Gi  #至少1Gi的存储空间

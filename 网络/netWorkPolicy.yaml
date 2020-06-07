@@ -1,0 +1,39 @@
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy    # 负责为pod配置网络隔离，本质上是通过配置防火墙，iptables或者ipvs
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:   # 为哪个pod配置
+    matchLabels:
+      role: db     
+  policyTypes:
+  - Ingress   # 入方向的限制
+  - Egress   # 出方向的限制
+  ingress:
+  - from:  #这里相当于白名单， 白名单之外的全部不允许访问
+    - ipBlock:
+        cidr: 172.17.0.0/16   # 允许172.17.0.0/16除了 172.17.1.0/24
+        except:
+        - 172.17.1.0/24
+    # 或
+    - namespaceSelector:   #携带了 project=myproject 标签的 Namespace 里的任何 Pod
+        matchLabels:
+          project: myproject
+    # 或
+    - podSelector:  #default Namespace 里的，携带了 role=fronted 标签的 Pod；
+        matchLabels:
+          role: frontend
+    ports:
+    - protocol: TCP
+      port: 6379
+
+
+  egress:  #Kubernetes 会拒绝被隔离 Pod 对外发起任何请求，除非请求的目的地址属于 10.0.0.0/24 网段，并且访问的是该网段地址的 5978 端口。
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/24
+    ports:
+    - protocol: TCP
+      port: 5978

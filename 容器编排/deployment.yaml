@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment   #replicaset的控制器 实际上控制的是 ReplicaSet 的数目，以及每个 ReplicaSet 的属性，滚动更新时实际上就是deploy不断的增加新版本的rs的replicas的数量，并不断的减少旧版本replicas的数量
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3  #pod的数量是3
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxSurge: 1  #滚动更新pod时，一次(一轮控制循环)最多额外(除去用户期望DESIRED （默认%25）)创建多少个pod   
+            maxUnavailable: 1 #滚动更新pod时，一次(一轮控制循环)最多额外(除去用户期望DESIRED （默认%25）)删除多少个pod ;maxUnavailable=50%，指的是我们最多可以一次删除“50%*DESIRED 数量”个 Pod。
+
+  revisionHistoryLimit: 1  # deploy历史版本个数，也就是rs的保留个数， 当他为0时就无法回滚了 
+
+
+
+
+
+  template:  #pod的定义
+    metadata:  # 无需定义名字，控制器会赋予pod名字
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.1
+        ports:
+        - containerPort: 80

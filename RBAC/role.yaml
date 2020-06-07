@@ -1,0 +1,9 @@
+kind: Role # 角色，就是一组规则
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: mynamespace   # 这组规则的生效范围
+  name: example-role
+rules: # 允许mynamespace里的pods进行get watch list 操作
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]

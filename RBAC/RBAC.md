@@ -1,0 +1,3 @@
+# 常用方法
+
+创建一个serviceAccount对象作为用户， 创建一个role作为角色， 创建一个rolebinding 将角色与用户绑定， 创建pod时指定使用这个serviceAccount 代替默认的default-serviceAccount, 这个pod就拥有了role中定义的权限

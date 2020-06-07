@@ -1,0 +1,22 @@
+
+apiVersion: batch/v1beta1
+kind: CronJob   # job的控制器， 定义job的创建规则， 达到实现定时任务，循环任务的目的
+metadata:
+  name: hello
+spec:
+  schedule: "*/1 * * * *"    #分钟、小时、日、月、星期。  实例每分钟创建一个job
+  concurrencyPolicy: Allow   # Allow: job可以同时存在（第一个job没运行完成，第二个可以进行按计划创建）Forbid: 上一个job没运行完本轮被跳过  Replace: 新的job会替换没运行完的旧job
+  startingDeadlineSeconds: 200  # 在过去200s里，创建job失败100次就永久的停止创建了
+
+  jobTemplate: # job的定义
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+          restartPolicy: OnFailure

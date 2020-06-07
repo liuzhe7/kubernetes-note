@@ -1,0 +1,17 @@
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset #相当于pod模板
+metadata:
+  name: allow-database
+spec:
+  selector:
+    matchLabels:
+      role: frontend  #选择带有这个标签的pod ， 将如下定追加到pod
+  env:
+    - name: DB_PORT
+      value: "6379"
+  volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+    - name: cache-volume
+      emptyDir: {}

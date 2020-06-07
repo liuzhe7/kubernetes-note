@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service #Service 是 Kubernetes 项目中用来将一组 Pod 暴露给其他pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None   # 不指定vip 就是headless-service, 以dns的方式暴露出它所代理的pod 的ip  ：<pod-name>.<svc-name>.<namespace>.svc.cluster.local
+  selector:
+    app: nginx

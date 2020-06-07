@@ -1,0 +1,1 @@
+# 利用自定义控制器（initialize），每次创建pod的时候都会判断这个pod是否被自己初始化过， 如果没有就利用预先配置好的configmap（configmap里就是envoy容器），创建一个pod， 然后再利用声明式api的特性合并这个另个POD

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet  # 在deployment的基础上增加了记录pod状态的功能， 当pod被重建时，能够恢复状态
+metadata:
+  name: web
+spec:
+  serviceName: "nginx"  #在执行控制循环（Control Loop）的时候，请使用 nginx 这个 Headless Service 来保证 Pod 的“可解析身份
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.9.1
+        ports:
+        - containerPort: 80
+          name: web

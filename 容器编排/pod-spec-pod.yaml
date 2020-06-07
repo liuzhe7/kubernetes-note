@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    annotations:   #指定pod要使用的initializer 创建pod时对pod进merge， 可以多个 initializer同时修改一个pod
+      "initializer.kubernetes.io/envoy": "true"
+    name: nginx
+spec:
+
+    nodeSelector: # 这个pod只可能被调度在携带 mylabels=n1 的node上
+        mylabels: n1
+
+    hostAliases: # 创建pod时 定义了 Pod 的 hosts 文件 /etc/hosts  10.1.2.3 foo.remote;10.1.2.3 bar.remote
+        - ip: "10.1.2.3"
+          hostnames:
+            - "foo.remote"
+            - "bar.remote"
+
+    shareProcessNamespace: true # 所有容器之间共享PIDnamespace
+
+    hostNetwork: true # pod共享宿主机的network ipc pid namespace
+    hostIPC: true
+ #  hostPID: true #这个不能与 shareProcessNamespace同时启用
+    
+
+    restartPolicy: Never #只要有容器(是容器，不是pod)不在running状态,会重新创建,节点不会更换;OnFailure: 只在容器 异常时才自动重启容器；Never: 从来不重启容器。
+
+    
+    volumes:     # volume声明是pod及别的所以才能共享
+    - name: shared-data
+      hostPath:   #这个volume宿主机的/data目录下
+        path: /data
+
+    initContainers: #initContainers 运行完成正常退出后普通container才会被创建   这个一定要定义在上面 从上到下依次创建
+    - name: debian-initcontainer
+      image: debian
+      volumeMounts:
+        - name: shared-data
+          mountPath: /pod-data
+      command: ["/bin/sh"] # 相当于覆盖了docker的 entrypoint
+      args: ["-c","echo Hello from the init_debian container > /pod-data/index.html"] # 相当于覆盖了docker 的 command：
+
+    containers:
+        - name: nginx
+          image: nginx:1.8
+        - name: debian-container
+          image: debian
+          command: ["/bin/sh"] # 相当于覆盖了docker的 entrypoint
+          args: ["-c","echo Hello from the normal_debian container"] # 相当于覆盖了docker 的 command：
+
+

@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx
+spec:
+    containers:
+        - name: nginx
+          image: nginx:1.8
+          imagePullPolicy: Never   # Never 永不拉取镜像 ;  Always 每次创建pod都拉取一次镜像 当镜像tag是lastest时 这个值只能是Always; ifNotPresent只在宿主机上不存在这个镜像时才拉取;
+          lifecycle:
+            postStart: #容器启动时执行异步，不保证entrypoint已经执行完
+                exec:
+                    command: ["echo start"]
+            preStop: # 容器被杀死之前执行， 同步的会阻塞杀死知道 这里执行完
+                exec:
+                    command: ["echo quit"]
+                    
+        - name: shell
+          image: busybox
+          stdin: true
+          tty: true
+
+        
+        - name: liveness 
+          image: busybox
+          args:
+          - /bin/sh
+          - -c
+          - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+
+
+          livenessProbe: # 额外的健康检查。 默认k8只会根据docker的entyrpoint进程来判断是否健康
+            exec:
+              command:  #命令的返回值是0 则健康， 其他则不健康
+              - cat
+              - /tmp/healthy
+            initialDelaySeconds: 5 # 容器启动后5秒开始执行
+            periodSeconds: 5 # 每5秒执行一次  
+            
+            
+            httpGet: #对本地8080端口发送http请求来健康检查
+              path: /healthz
+              port: 8080
+              httpHeaders:
+              - name: X-Custom-Header
+                value: Awesome
+              initialDelaySeconds: 3
+              periodSeconds: 3
+
+        
+            tcpSocket: # 监听端口
+              port: 8080
+              initialDelaySeconds: 15
+              periodSeconds: 20

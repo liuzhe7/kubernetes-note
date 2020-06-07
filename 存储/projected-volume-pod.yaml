@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-projected-volume 
+spec:
+  containers:
+  - name: test-secret-volume
+    image: busybox
+    args:
+    - sleep
+    - "86400"
+    volumeMounts:
+    - name: mysql-cred
+      mountPath: "/projected-volume"
+      readOnly: true
+
+  volumes:
+  - name: mysql-cred
+    projected: #使用投射数据卷一共四种类型 Secret；ConfigMap；Downward API；ServiceAccountToken。
+      sources:
+
+
+      - secret:
+          name: mysecret # 提前准本一个secret。是帮你把 Pod 想要访问的加密数据，存放到 Etcd 中。然后，你就可以通过在 Pod 的容器里挂载 Volume 的方式，访问到这些 Secret 里保存的信息了
+
+
+
+      - configMap:
+          name: myconfigmap #敏感数据的secret 也需要事先准备好ConfigMap对象
+        
+
+
+      - downwardAPI:  # pod在etcd的元数据注入到pod内部
+          items:
+            - path: "namespace" #定义存储数据的文件名字
+              fieldRef: 
+                fieldPath: metadata.namespace
+            - path: "labels"
+              fieldRef: 
+                fieldPath: metadata.labels
+                    #    spec.nodeName  #节点名字 1.15版本一不支持
+                    #    status.hostIP # 宿主机IP
+                    #    metadata.name # Pod的名字
+                    #    metadata.namespace # Pod的Namespace
+                    #    status.podIP # Pod的IP
+                    #    spec.serviceAccountName # Pod的Service Account的名字
+                    #    metadata.uid # Pod的UID
+                    #    metadata.labels['<KEY>'] # 指定<KEY>的Label值
+                    #    metadata.annotations['<KEY>'] # 指定<KEY>的Annotation值
+                    #    metadata.labels # Pod的所有Label
+                    #    metadata.annotations # Pod的所有Annotation
+            
+            - path: "cpu_limit"
+              resourceFieldRef:
+                containerName: test-secret-volume  # 获取指定容器的资源限制数据
+                resource: limits.cpu  #最多用多少cpu资源
+            - path: "cpu_request"
+              resourceFieldRef:
+                containerName: test-secret-volume
+                resource: requests.cpu
+            - path: "mem_limit"
+              resourceFieldRef:
+                containerName: test-secret-volume
+                resource: limits.memory
+            - path: "mem_request"
+              resourceFieldRef:
+                containerName: test-secret-volume
+                resource: requests.memory
+
+
+        #ServiceAccountToken 一种特殊的secret 存储授权信息，pod默认就会挂在一个通过它可以访问kubeapi-server
+
+
+
+      

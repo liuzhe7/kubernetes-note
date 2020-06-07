@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job  # 一种控制器，直接控制pod，pod的restartpolicy 永远只能是NEVER
+metadata:
+  name: pi
+spec:
+  parallelism: 2  # 最大并行度也就是同时在running状态的pod最多有2个
+  completions: 4  # 处于完成状态的pod为4时，结束任务完成，job停止发送创建pod的请求
+
+  template:    #pod的定义
+    spec:
+      containers:
+      - name: pi
+        image: resouer/ubuntu-bc
+        command: ["sh", "-c", "echo 'scale=5000; 4*a(1)' | bc -l "]
+      restartPolicy: Never
+
+
+  backoffLimit: 4 #当有pod失败运行中断时，尝试创建一个新的pod最多创建4次
