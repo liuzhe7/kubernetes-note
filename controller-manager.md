@@ -1,3 +1,3 @@
 # informer循环（负责监听的） ，listwatch对APIserver进行监听（利用某个对象的cilent监听这个对象，所以需要把自定义对象的client给他)，一旦有一个新的对象提交到apiSERVER， apiserver就会反推到controller的 listwatch, 然后按照 namespace/name 的key值将他放到一个队列中
 
-# controller循环（负责对具体资源增删改的），controlller从队列取出对象，然后将他交给一个worker去处理，可以有多个worker并行的对不同的对象进行处理,处理失败的会将其key放回队列
+# controller循环（负责对具体资源增删改的），controlller从队列取出对象，通过handler找到对应的处理函数，然后起多个worker去处理，可以有多个worker并行的对不同的对象进行处理,处理失败的会将其key放回队通过

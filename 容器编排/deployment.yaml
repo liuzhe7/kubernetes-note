@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 3  #pod的数量是3
+  replicas: 12  #pod的数量是3
 
   selector:
     matchLabels:
